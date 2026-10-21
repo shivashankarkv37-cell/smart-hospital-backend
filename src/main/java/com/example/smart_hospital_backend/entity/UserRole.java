@@ -1,5 +1,8 @@
 package com.example.smart_hospital_backend.entity;
 
 public enum UserRole {
-    PATIENT
+    PATIENT,
+    DOCTOR,
+    RECEPTIONIST,
+    ADMIN
 }

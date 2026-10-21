@@ -22,7 +22,9 @@ public record RegisterRequest(
 
         @NotBlank(message = "Password must not be blank")
         @Size(min = 8, max = 72, message = "Password must be between 8 and 72 characters")
-        @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$", message = "Password must contain at least one letter and one number")
+        @Pattern(
+                regexp = "^(?=.*[A-Za-z])(?=.*\\d).+$",
+                message = "Password must contain at least one letter and one number")
         String password,
 
         @Pattern(regexp = "^PATIENT$", message = "Only patient accounts can be registered")

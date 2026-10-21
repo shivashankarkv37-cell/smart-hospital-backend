@@ -1,13 +1,16 @@
 package com.example.smart_hospital_backend.controller;
 
-import com.example.smart_hospital_backend.dto.RegisterRequest;
+import com.example.smart_hospital_backend.dto.AuthenticatedUserResponse;
+import com.example.smart_hospital_backend.dto.LoginRequest;
 import com.example.smart_hospital_backend.dto.LoginResponse;
+import com.example.smart_hospital_backend.dto.RegisterRequest;
 import com.example.smart_hospital_backend.dto.UserResponse;
+import com.example.smart_hospital_backend.service.AuthService;
 import com.example.smart_hospital_backend.service.UserService;
 import jakarta.validation.Valid;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.security.Principal;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,8 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService) { this.userService = userService; }
+    public AuthController(UserService userService, AuthService authService) {
+        this.userService = userService;
+        this.authService = authService;
+    }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
@@ -28,10 +35,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public LoginResponse login(@AuthenticationPrincipal UserDetails authenticatedUser) {
-        String role = authenticatedUser.getAuthorities().stream()
-                .findFirst().map(authority -> authority.getAuthority().replaceFirst("^ROLE_", ""))
-                .orElse("PATIENT");
-        return new LoginResponse(authenticatedUser.getUsername(), role, "Authentication successful");
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
+
+    @GetMapping("/me")
+    public AuthenticatedUserResponse currentUser(Principal principal) {
+        return authService.currentUser(principal.getName());
     }
 }
